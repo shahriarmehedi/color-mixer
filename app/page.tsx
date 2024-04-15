@@ -1,9 +1,10 @@
 import Image from "next/image";
 import ColorControllerUI from '../components/ColorControllerUI';
+
 export default function Home() {
-  return (
-    <div>
-      <ColorControllerUI />
-    </div>
-  );
+    return (
+        <main className="dark:bg-zinc-800 bg-white">
+            <ColorControllerUI />
+        </main>
+    );
 }

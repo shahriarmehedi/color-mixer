@@ -4,6 +4,9 @@ import { useState } from 'react';
 import ColorSlider from './ColorSlider';
 
 const ColorControllerUI = () => {
+
+
+
     const [red, setRed] = useState(0);
     const [green, setGreen] = useState(0);
     const [blue, setBlue] = useState(0);
@@ -81,36 +84,73 @@ const ColorControllerUI = () => {
 
     };
 
+
     const outputColor = `rgb(${red},${green},${blue})`;
     // const hexColor = `#${((1 << 24) + (red << 16) + (green << 8) + blue).toString(16).slice(1)}`;
+
+
+
+
+    // Custom Grid creation
+
+    // selecting a grid div will console log the grid div id
+    const selectGrid = (e) => {
+        console.log(e.target.id);
+    }
+
+
+    const gridDiv =
+        <div
+            id={1}
+            onClick={selectGrid}
+            className="w-36 h-36 border border-zinc-300 dark:border-zinc-700 cursor-pointer"
+            style={{
+                backgroundColor: outputColor,
+            }}
+        ></div>
+
+
+
+
+    // Create a function that will take input of grid number and return the grid div
+
+
+    const [gridNumber, setGridNumber] = useState(3);
+
+
+
+    const createGrid = (gridNumber) => {
+        let grid = [];
+        for (let i = 0; i < gridNumber; i++) {
+            grid.push(gridDiv);
+        }
+        return grid;
+    }
+
+
+    // appropriate grid classNames based on grid number
+
+    const gridClass = gridNumber === 1 ? "" : gridNumber === 2 ? "grid-cols-2" : gridNumber > 2 && gridNumber <= 4 ? "grid-cols-3" : gridNumber >= 5 && gridNumber <= 9 ? "grid-cols-3" : gridNumber >= 10 && gridNumber <= 16 ? "grid-cols-4" : "grid-cols-5";
+
+
+
+
+
+
 
     return (
         <div className="h-screen">
 
-            <div className="flex items-center gap-5 justify-center mt-10 lg:mt-20 scale-90 lg:scale-100">
+            <div className="flex items-center gap-5 justify-center pt-10 lg:pt-36 scale-90 lg:scale-100">
                 <div
-                    className=" w-40 h-40 mt-8 "
-                    style={{
-                        backgroundColor: outputColor,
-                        border: '1px solid black',
-                    }}
-                ></div>
-                <div
-                    className=" w-40 h-40 mt-8 "
-                    style={{
-                        backgroundColor: outputColor,
-                        border: '1px solid black',
-                    }}
-                ></div>
-                <div
-                    className=" w-40 h-40 mt-8 "
-                    style={{
-                        backgroundColor: outputColor,
-                        border: '1px solid black',
-                    }}
-                ></div>
+                    className={`grid grid-cols-1 gap-5 ${gridClass}`}
+                >
+                    {createGrid(gridNumber)}
+                </div>
+
+
             </div>
-            <div className="flex flex-col justify-between bg-[#C4C4C4] pt-10 rounded-2xl scale-90 lg:scale-100 lg:absolute lg:bottom-20 lg:right-20">
+            <div className="flex flex-col justify-between bg-[#C4C4C4] dark:bg-zinc-700 pt-10 rounded-2xl scale-90 lg:scale-100 lg:absolute lg:bottom-20 lg:right-20 w-[340px]">
                 <div className="flex items-center  flex-wrap ">
                     <ColorSlider svg="/GS_handle.svg" color="white" value={black} onChange={(value) => handleSliderChange('Black', value)} />
                     <ColorSlider svg="/R handle.svg" color="Red" value={red} onChange={(value) => handleSliderChange('Red', value)} />
@@ -121,14 +161,14 @@ const ColorControllerUI = () => {
                     <ColorSlider svg="/M_handle.svg" color="Magenta" value={magenta} onChange={(value) => handleSliderChange('Magenta', value)} />
                 </div>
                 <div className="flex justify-center items-center gap-1 pt-7">
-                    <div className='bg-[#A9A9A9] text-white text-center w-1/2 p-3 rounded-bl-2xl'>
+                    <div className='bg-[#A9A9A9] dark:bg-zinc-600 text-white text-center w-1/2 p-3 rounded-bl-2xl'>
                         <h2>
                             {
                                 `${red},${green},${blue}`
                             }
                         </h2>
                     </div>
-                    <div className='bg-[#A9A9A9] text-white text-center w-1/2 p-3 rounded-br-2xl'>
+                    <div className='bg-[#A9A9A9] dark:bg-zinc-600 text-white text-center w-1/2 p-3 rounded-br-2xl'>
                         <h2>
                             {
                                 //hexadecimal value in 0x000000 format 
