@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ColorSlider from './ColorSlider';
 
 const ColorControllerUI = () => {
@@ -14,6 +14,8 @@ const ColorControllerUI = () => {
     const [yellow, setYellow] = useState(0); // Corrected state variable
     const [cyan, setCyan] = useState(0); // Corrected state variable
     const [magenta, setMagenta] = useState(0); // Corrected state variable
+
+
 
     const handleSliderChange = (color, value) => {
         let newRed = red;
@@ -85,52 +87,129 @@ const ColorControllerUI = () => {
     };
 
 
-    const outputColor = `rgb(${red},${green},${blue})`;
+
+
+    useEffect(() => {
+
+        // Update Black slider position
+        const newBlack = Math.round((red + green + blue) / 3);
+        setBlack(newBlack);
+
+        // Update Yellow slider position when Red slider or Green slider position is changed and also update Yellow SLider when Magenta slider is changed
+        setYellow(Math.round((red + green) / 2));
+
+        // Update Cyan slider position when Green slider or Blue slider position is changed and also update Cyan SLider when Yellow slider is changed
+        setCyan(Math.round((green + blue) / 2));
+
+        // Update Magenta slider position when Red slider or Blue slider position is changed and also update Magenta SLider when Yellow slider is changed
+        setMagenta(Math.round((red + blue) / 2));
+
+    }, [red, green, blue]);
+
+
+    const outputColorCode = `rgb(${red},${green},${blue})`;
     // const hexColor = `#${((1 << 24) + (red << 16) + (green << 8) + blue).toString(16).slice(1)}`;
 
 
 
 
-    // Custom Grid creation
-
-    // selecting a grid div will console log the grid div id
-    const selectGrid = (e) => {
-        console.log(e.target.id);
-    }
+    // ------------------- GRID Color Controller UI ------------------- //
 
 
-    const gridDiv =
-        <div
-            id={1}
-            onClick={selectGrid}
-            className="w-36 h-36 border border-zinc-300 dark:border-zinc-700 cursor-pointer"
-            style={{
-                backgroundColor: outputColor,
-            }}
-        ></div>
+    const [gridNumber, setGridNumber] = useState(9);
 
 
+    const [outputColor, setOutputColor] = useState(outputColorCode); // Initial output color
+    const [boxColors, setBoxColors] = useState(Array(16).fill(outputColorCode)); // Array to store colors of each box
+    const [selectedBox, setSelectedBox] = useState(null); // State to keep track of the selected box
 
-
-    // Create a function that will take input of grid number and return the grid div
-
-
-    const [gridNumber, setGridNumber] = useState(3);
+    // Function to handle changing the output color for a specific box
+    const handleColorChange = (newColor) => {
+        setOutputColor(
+            newColor
+        );
+        // If a box is selected, update its color
+        if (selectedBox !== null) {
+            const newBoxColors = [...boxColors]; // Create a copy of boxColors
+            newBoxColors[selectedBox] = newColor; // Update the color of the selected box
+            setBoxColors(newBoxColors); // Update boxColors state
+        }
+    };
 
 
 
+    // call handleColorChange when any of the color sliders are changed
+    useEffect(() => {
+        handleColorChange(outputColorCode);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [outputColorCode]);
+
+    // Function to handle selecting a box
+    const handleBoxClick = (index) => {
+        setSelectedBox(index);
+        // set the slider values to the selected box color values
+
+        if (boxColors[index] === 'rgb(0,0,0)') {
+            setRed(0);
+            setGreen(0);
+            setBlue(0);
+            setCyan(0);
+            setMagenta(0);
+            setYellow(0);
+            setBlack(0);
+        } else if (boxColors[index] === 'rgb(255,255,255)') {
+            setRed(255);
+            setGreen(255);
+            setBlue(255);
+            setCyan(255);
+            setMagenta(255);
+            setYellow(255);
+            setBlack(255);
+        } else {
+            // Extract the RGB values from the color string and update the sliders
+            const [r, g, b] = boxColors[index].match(/\d+/g);
+            setRed(parseInt(r));
+            setGreen(parseInt(g));
+            setBlue(parseInt(b));
+        }
+
+
+
+    };
+
+    // Function to create individual grid box elements
     const createGrid = (gridNumber) => {
         let grid = [];
         for (let i = 0; i < gridNumber; i++) {
-            grid.push(gridDiv);
+            grid.push(
+                <div
+                    key={i}
+                    className={`w-36 h-36 border cursor-pointer ${selectedBox === i ? " border-sky-500 dark:border-sky-500  " : "border-zinc-300 dark:border-zinc-700"
+                        }`}
+                    style={{
+                        backgroundColor:  // Use boxColors array to set background color
+                            boxColors[i],
+                    }}
+                    onClick={() => handleBoxClick(i)} // Call handleBoxClick when a box is clicked
+                ></div>
+            );
         }
         return grid;
-    }
+    };
 
-
-    // appropriate grid classNames based on grid number
-
-    const gridClass = gridNumber === 1 ? "" : gridNumber === 2 ? "grid-cols-2" : gridNumber > 2 && gridNumber <= 4 ? "grid-cols-3" : gridNumber >= 5 && gridNumber <= 9 ? "grid-cols-3" : gridNumber >= 10 && gridNumber <= 16 ? "grid-cols-4" : "grid-cols-5";
+    // Determine appropriate grid structure based on grid number
+    const gridClass =
+        gridNumber === 1
+            ? ""
+            : gridNumber === 2
+                ? "grid-cols-2"
+                : gridNumber > 2 && gridNumber <= 4
+                    ? "grid-cols-3"
+                    : gridNumber >= 5 && gridNumber <= 9
+                        ? "grid-cols-3"
+                        : gridNumber >= 10 && gridNumber <= 16
+                            ? "grid-cols-4"
+                            : "grid-cols-5";
 
 
 
