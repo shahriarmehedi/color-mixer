@@ -59,10 +59,30 @@ const ColorControllerUI = () => {
         setRed(newRed);
         setGreen(newGreen);
         setBlue(newBlue);
+
+
+        // Update Yellow slider position when Red slider or Green slider position is changed and also update Yellow SLider when Magenta slider is changed
+        if (color === 'Red' || color === 'Green' || color === 'Magenta' || color === 'Cyan') {
+            setYellow(Math.round((newRed + newGreen) / 2));
+        }
+
+
+        // Update Cyan slider position when Green slider or Blue slider position is changed and also update Cyan SLider when Yellow slider is changed
+        if (color === 'Green' || color === 'Blue' || color === 'Yellow' || color === 'Magenta') {
+            setCyan(Math.round((newGreen + newBlue) / 2));
+        }
+
+
+        // Update Magenta slider position when Red slider or Blue slider position is changed and also update Magenta SLider when Yellow slider is changed
+        if (color === 'Red' || color === 'Blue' || color === 'Yellow' || color === 'Cyan') {
+            setMagenta(Math.round((newRed + newBlue) / 2));
+        }
+
+
     };
 
     const outputColor = `rgb(${red},${green},${blue})`;
-    const hexColor = `#${((1 << 24) + (red << 16) + (green << 8) + blue).toString(16).slice(1)}`;
+    // const hexColor = `#${((1 << 24) + (red << 16) + (green << 8) + blue).toString(16).slice(1)}`;
 
     return (
         <div className="h-screen">

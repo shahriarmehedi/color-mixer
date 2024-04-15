@@ -39,7 +39,6 @@ const ColorSlider = ({ svg, color, value, onChange }) => {
 
     return (
         <div className="flex flex-col items-center space-y-2">
-            {/* <p className="text-lg font-bold">{color}</p> */}
             <div
                 ref={sliderRef}
                 className="h-64 w-12 relative cursor-pointer flex flex-col items-center "
@@ -65,7 +64,6 @@ const ColorSlider = ({ svg, color, value, onChange }) => {
                     />
                 </div>
             </div>
-            {/* <p>{value}</p> */}
         </div>
     );
 };
