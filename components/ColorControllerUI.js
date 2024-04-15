@@ -185,7 +185,7 @@ const ColorControllerUI = () => {
             grid.push(
                 <div
                     key={i}
-                    className={`w-36 h-36 border cursor-pointer ${selectedBox === i ? " border-sky-500 dark:border-sky-500  " : "border-zinc-300 dark:border-zinc-700"
+                    className={`w-[120px] h-[120px] lg:w-[200px] lg:h-[200px] border cursor-pointer ${selectedBox === i ? " border-sky-500 dark:border-sky-500  " : "border-zinc-300 dark:border-zinc-700"
                         }`}
                     style={{
                         backgroundColor:  // Use boxColors array to set background color
@@ -210,7 +210,7 @@ const ColorControllerUI = () => {
                         ? "grid-cols-2"
                         : gridNumber >= 5 && gridNumber <= 9
                             ? "grid-cols-3"
-                            : gridNumber >= 10 && gridNumber <= 16
+                            : gridNumber >= 10 && gridNumber <= 12
                                 ? "grid-cols-4"
                                 : "grid-cols-5";
 
@@ -223,11 +223,11 @@ const ColorControllerUI = () => {
     const createAGrid = () => {
         Swal.fire({
             // max grid number is 16
-            title: 'Enter box number (1-16):',
+            title: 'Enter box number (1-12):',
             input: 'number',
             inputAttributes: {
                 min: 1,
-                max: 16,
+                max: 12,
                 step: 1,
             },
             showCancelButton: true,
@@ -273,9 +273,9 @@ const ColorControllerUI = () => {
 
 
     return (
-        <div className="h-screen">
+        <div className="min-h-screen pb-10">
 
-            <div className="flex items-center gap-5 justify-center pt-10 lg:pt-36 scale-90 lg:scale-100">
+            <div className="flex items-center gap-10 justify-center pt-10 lg:pt-40 scale-90 lg:scale-100">
                 {
                     !isGridCreated ? (
                         <button onClick={createAGrid} className="bg-[#A9A9A9] dark:bg-zinc-600 text-white text-center  px-7 py-5 rounded-lg">
@@ -292,7 +292,7 @@ const ColorControllerUI = () => {
             </div>
 
 
-            <div className="flex flex-col justify-between bg-[#C4C4C4] dark:bg-zinc-700 pt-10 rounded-2xl scale-90 lg:scale-100 lg:absolute lg:bottom-20 lg:right-20 w-[340px]">
+            <div className="flex flex-col justify-center lg:justify-between bg-[#C4C4C4] dark:bg-zinc-700 pt-10 rounded-2xl lg:scale-100 lg:absolute lg:bottom-20 lg:right-20 mt-10 lg:mt-0 w-[340px]">
                 <div className="flex items-center  flex-wrap ">
                     <ColorSlider svg="/GS_handle.svg" color="white" value={black} onChange={(value) => handleSliderChange('Black', value)} />
                     <ColorSlider svg="/R handle.svg" color="Red" value={red} onChange={(value) => handleSliderChange('Red', value)} />
