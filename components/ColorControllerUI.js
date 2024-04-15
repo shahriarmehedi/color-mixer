@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ColorSlider from './ColorSlider';
+import Swal from 'sweetalert2';
 
 const ColorControllerUI = () => {
 
@@ -203,16 +204,70 @@ const ColorControllerUI = () => {
             ? ""
             : gridNumber === 2
                 ? "grid-cols-2"
-                : gridNumber > 2 && gridNumber <= 4
+                : gridNumber > 2 && gridNumber <= 3
                     ? "grid-cols-3"
-                    : gridNumber >= 5 && gridNumber <= 9
-                        ? "grid-cols-3"
-                        : gridNumber >= 10 && gridNumber <= 16
-                            ? "grid-cols-4"
-                            : "grid-cols-5";
+                    : gridNumber === 4
+                        ? "grid-cols-2"
+                        : gridNumber >= 5 && gridNumber <= 9
+                            ? "grid-cols-3"
+                            : gridNumber >= 10 && gridNumber <= 16
+                                ? "grid-cols-4"
+                                : "grid-cols-5";
 
 
 
+    // state
+
+    const [isGridCreated, setIsGridCreated] = useState(false);
+
+    const createAGrid = () => {
+        Swal.fire({
+            // max grid number is 16
+            title: 'Enter box number (1-16):',
+            input: 'number',
+            inputAttributes: {
+                min: 1,
+                max: 16,
+                step: 1,
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Create Grid',
+            cancelButtonText: 'Cancel',
+            showLoaderOnConfirm: true,
+            preConfirm: (gridNumber) => {
+                return new Promise((resolve) => {
+                    if (gridNumber > 0 && gridNumber <= 16) {
+                        resolve();
+                    } else {
+                        resolve(Swal.showValidationMessage('Please enter a number between 1 and 16'));
+                    }
+                });
+            }
+        })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    setGridNumber(parseInt(result.value));
+                    setIsGridCreated(true);
+                }
+            });
+    }
+
+
+    const resetLayout = () => {
+        setRed(0);
+        setGreen(0);
+        setBlue(0);
+        setBlack(0);
+        setYellow(0);
+        setCyan(0);
+        setMagenta(0);
+        setGridNumber(0);
+        setIsGridCreated(false);
+        // clear the box colors and set 0,0,0 color to all boxes
+        setBoxColors(Array(16).fill('rgb(0,0,0)'));
+        setSelectedBox(null);
+
+    }
 
 
 
@@ -221,14 +276,22 @@ const ColorControllerUI = () => {
         <div className="h-screen">
 
             <div className="flex items-center gap-5 justify-center pt-10 lg:pt-36 scale-90 lg:scale-100">
-                <div
-                    className={`grid grid-cols-1 gap-5 ${gridClass}`}
-                >
-                    {createGrid(gridNumber)}
-                </div>
-
-
+                {
+                    !isGridCreated ? (
+                        <button onClick={createAGrid} className="bg-[#A9A9A9] dark:bg-zinc-600 text-white text-center  px-7 py-5 rounded-lg">
+                            Create a Grid Layout
+                        </button>
+                    ) : (
+                        <div
+                            className={`grid grid-cols-1 gap-5 ${gridClass}`}
+                        >
+                            {createGrid(gridNumber)}
+                        </div>
+                    )
+                }
             </div>
+
+
             <div className="flex flex-col justify-between bg-[#C4C4C4] dark:bg-zinc-700 pt-10 rounded-2xl scale-90 lg:scale-100 lg:absolute lg:bottom-20 lg:right-20 w-[340px]">
                 <div className="flex items-center  flex-wrap ">
                     <ColorSlider svg="/GS_handle.svg" color="white" value={black} onChange={(value) => handleSliderChange('Black', value)} />
@@ -257,6 +320,25 @@ const ColorControllerUI = () => {
                     </div>
                 </div>
             </div>
+
+            {
+                isGridCreated && (
+                    <div
+                        onClick={resetLayout}
+                        className=" lg:absolute lg:bottom-20 lg:left-20 w-[300px] cursor-pointer">
+                        {/* reset layout button */}
+                        <div className="flex justify-center items-center gap-1 pt-7">
+                            <div className='bg-[#A9A9A9] dark:bg-zinc-600 text-white text-center w-1/2 p-3 rounded-lg'>
+                                <h2>
+                                    {
+                                        `Reset Layout`
+                                    }
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
 
         </div>
     );
