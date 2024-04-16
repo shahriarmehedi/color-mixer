@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ColorSlider from './ColorSlider';
 import Swal from 'sweetalert2';
 
@@ -34,10 +34,14 @@ const ColorControllerUI = () => {
                 newBlue = value;
                 break;
             case 'Black':
-                const avg = Math.round((red + green + blue) / 3);
-                newRed = avg;
-                newGreen = avg;
-                newBlue = avg;
+                // Moving black slider should update all other sliders to same value as black slider
+                newRed = value;
+                newGreen = value;
+                newBlue = value;
+                setRed(value); // Update the state variable for Red
+                setGreen(value); // Update the state variable for Green
+                setBlue(value); // Update the state variable for Blue
+
                 break;
             case 'Yellow':
                 newRed = value;
@@ -185,7 +189,7 @@ const ColorControllerUI = () => {
             grid.push(
                 <div
                     key={i}
-                    className={`w-[120px] h-[120px] lg:w-[200px] lg:h-[200px] border cursor-pointer ${selectedBox === i ? " border-sky-500 dark:border-sky-500  " : "border-zinc-300 dark:border-zinc-700"
+                    className={`w-[120px] h-[120px] lg:w-[200px] lg:h-[200px]  cursor-pointer     ${selectedBox === i ? " border-sky-500 dark:border-sky-500 border btn rounded-none  " : ""
                         }`}
                     style={{
                         backgroundColor:  // Use boxColors array to set background color
@@ -223,7 +227,7 @@ const ColorControllerUI = () => {
     const createAGrid = () => {
         Swal.fire({
             // max grid number is 16
-            title: 'Enter box number (1-12):',
+            title: 'Enter grid number:',
             input: 'number',
             inputAttributes: {
                 min: 1,
@@ -231,7 +235,7 @@ const ColorControllerUI = () => {
                 step: 1,
             },
             showCancelButton: true,
-            confirmButtonText: 'Create Grid',
+            confirmButtonText: 'Create Layout',
             cancelButtonText: 'Cancel',
             showLoaderOnConfirm: true,
             preConfirm: (gridNumber) => {
@@ -270,10 +274,39 @@ const ColorControllerUI = () => {
     }
 
 
+    const [backgroundColor, setBackgroundColor] = useState('white'); // Initial background color
+
+    const mainDivRef = useRef(null);
+
+    useEffect(() => {
+        // Function to handle clicks outside the grid area
+        const handleClickOutside = (event) => {
+            // Check if the click occurred outside the grid area
+            if (mainDivRef.current && !mainDivRef.current.contains(event.target)) {
+                // Change the background color of min-div only if grid is not created
+                if (isGridCreated) {
+                    console.log('Nothing')
+                }
+            }
+        };
+
+        // Add event listener to document body when component mounts
+        document.addEventListener('click', handleClickOutside);
+
+        // Remove event listener when component unmounts
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isGridCreated]); // Re-run effect when isGridCreated changes
 
 
     return (
-        <div className="min-h-screen pb-10">
+        <div
+            style={{ backgroundColor: backgroundColor }}
+            ref={mainDivRef}
+            id='main-div'
+            className="min-h-screen pb-10">
 
             <div className="flex items-center gap-10 justify-center pt-10 lg:pt-40 scale-90 lg:scale-100">
                 {
@@ -292,10 +325,10 @@ const ColorControllerUI = () => {
             </div>
 
 
-            <div className="flex flex-col justify-center lg:justify-between bg-[#C4C4C4] dark:bg-zinc-700 pt-10 rounded-2xl lg:scale-100 lg:absolute lg:bottom-20 lg:right-20 mt-10 lg:mt-0 w-[340px]">
+            <div className="flex flex-col justify-center lg:justify-between bg-[#C4C4C4]  pt-10 rounded-2xl lg:scale-100 lg:absolute lg:bottom-14 lg:right-20 mt-10 lg:mt-0 w-[340px]">
                 <div className="flex items-center  flex-wrap ">
                     <ColorSlider svg="/GS_handle.svg" color="white" value={black} onChange={(value) => handleSliderChange('Black', value)} />
-                    <ColorSlider svg="/R handle.svg" color="Red" value={red} onChange={(value) => handleSliderChange('Red', value)} />
+                    <ColorSlider svg="/R_handle.svg" color="Red" value={red} onChange={(value) => handleSliderChange('Red', value)} />
                     <ColorSlider svg="/Y_handle.svg" color="Yellow" value={yellow} onChange={(value) => handleSliderChange('Yellow', value)} />
                     <ColorSlider svg="/G_handle.svg" color="Green" value={green} onChange={(value) => handleSliderChange('Green', value)} />
                     <ColorSlider svg="/C_handle.svg" color="Cyan" value={cyan} onChange={(value) => handleSliderChange('Cyan', value)} />
@@ -325,7 +358,7 @@ const ColorControllerUI = () => {
                 isGridCreated && (
                     <div
                         onClick={resetLayout}
-                        className=" lg:absolute lg:bottom-20 lg:left-20 w-[300px] cursor-pointer">
+                        className=" lg:absolute lg:bottom-14 lg:left-20 w-[300px] cursor-pointer">
                         {/* reset layout button */}
                         <div className="flex justify-center items-center gap-1 pt-7">
                             <div className='bg-[#A9A9A9] dark:bg-zinc-600 text-white text-center w-1/2 p-3 rounded-lg'>
