@@ -128,6 +128,8 @@ const ColorControllerUI = () => {
     const [boxColors, setBoxColors] = useState(Array(16).fill(outputColorCode)); // Array to store colors of each box
     const [selectedBox, setSelectedBox] = useState(null); // State to keep track of the selected box
 
+    console.log('Selected Box:', selectedBox)
+
     // Function to handle changing the output color for a specific box
     const handleColorChange = (newColor) => {
         setOutputColor(
@@ -149,38 +151,143 @@ const ColorControllerUI = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [outputColorCode]);
 
+
+
+
+
+
+
+    // ------------------------------------ CLONE COLOR ------------------------------------ //
+
+
+    const [clonedOutputColor, setClonedOutputColor] = useState(null);
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'Shift' && selectedBox !== null) {
+                setClonedOutputColor(boxColors[selectedBox]);
+            }
+        };
+
+        const handleKeyUp = (event) => {
+            if (event.key === 'Shift' && selectedBox !== null) {
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keyup', handleKeyUp);
+        };
+    }, [selectedBox, boxColors]);
+
+
+    console.log('clonedOutputColor', clonedOutputColor);
+
+
+
     // Function to handle selecting a box
     const handleBoxClick = (index) => {
-        setSelectedBox(index);
-        // set the slider values to the selected box color values
+        // if any cloned color is present, set the cloned color to the selected box
 
-        if (boxColors[index] === 'rgb(0,0,0)') {
-            setRed(0);
-            setGreen(0);
-            setBlue(0);
-            setCyan(0);
-            setMagenta(0);
-            setYellow(0);
-            setBlack(0);
-        } else if (boxColors[index] === 'rgb(255,255,255)') {
-            setRed(255);
-            setGreen(255);
-            setBlue(255);
-            setCyan(255);
-            setMagenta(255);
-            setYellow(255);
-            setBlack(255);
+        if (clonedOutputColor !== null) {
+            const newBoxColors = [...boxColors]; // Create a copy of boxColors
+            newBoxColors[index] = clonedOutputColor; // Update the color of the selected box
+            setBoxColors(newBoxColors); // Update boxColors state
+
+            setSelectedBox(index);
+
+
+
+
+            //update the sliders values according to the cloned color values
+
+            if (clonedOutputColor === 'rgb(0,0,0)') {
+                setRed(0);
+                setGreen(0);
+                setBlue(0);
+                setCyan(0);
+                setMagenta(0);
+                setYellow(0);
+                setBlack(0);
+            } else if (clonedOutputColor === 'rgb(255,255,255)') {
+                setRed(255);
+                setGreen(255);
+                setBlue(255);
+                setCyan(255);
+                setMagenta(255);
+                setYellow(255);
+                setBlack(255);
+            } else {
+                // Extract the RGB values from the color string and update the sliders
+                const [r, g, b] = clonedOutputColor.match(/\d+/g);
+                setRed(parseInt(r));
+                setGreen(parseInt(g));
+                setBlue(parseInt(b));
+            }
+
+
+
         } else {
-            // Extract the RGB values from the color string and update the sliders
-            const [r, g, b] = boxColors[index].match(/\d+/g);
-            setRed(parseInt(r));
-            setGreen(parseInt(g));
-            setBlue(parseInt(b));
+            setSelectedBox(index); // Update the selected box state
+
+
+
+
+            // set the slider values to the selected box color values
+
+            if (boxColors[index] === 'rgb(0,0,0)') {
+                setRed(0);
+                setGreen(0);
+                setBlue(0);
+                setCyan(0);
+                setMagenta(0);
+                setYellow(0);
+                setBlack(0);
+            } else if (boxColors[index] === 'rgb(255,255,255)') {
+                setRed(255);
+                setGreen(255);
+                setBlue(255);
+                setCyan(255);
+                setMagenta(255);
+                setYellow(255);
+                setBlack(255);
+            } else {
+                // Extract the RGB values from the color string and update the sliders
+                const [r, g, b] = boxColors[index].match(/\d+/g);
+                setRed(parseInt(r));
+                setGreen(parseInt(g));
+                setBlue(parseInt(b));
+            }
         }
 
 
 
+
+
+
     };
+
+
+    // update box color instantly when cloned color is present and box is clicked
+
+    // useEffect(() => {
+    //     if (clonedOutputColor !== null) {
+    //         const newBoxColors = [...boxColors]; // Create a copy of boxColors
+    //         newBoxColors[selectedBox] = clonedOutputColor; // Update the color of the selected box
+    //         setBoxColors(newBoxColors); // Update boxColors state
+
+    //         // select multiple boxes as many boxes are clicked with same color as cloned color
+
+    //         setSelectedBox(selectedBox);
+
+    //     }
+    // }, [selectedBox, clonedOutputColor, boxColors]);
+
+
+
 
     // Function to create individual grid box elements
     const createGrid = (gridNumber) => {
@@ -189,7 +296,7 @@ const ColorControllerUI = () => {
             grid.push(
                 <div
                     key={i}
-                    className={`w-[120px] h-[120px] lg:w-[200px] lg:h-[200px]  cursor-pointer     ${selectedBox === i ? " border-sky-500 dark:border-sky-500 border btn rounded-none  " : ""
+                    className={`w-[120px] h-[120px] lg:w-[200px] lg:h-[200px]  cursor-pointer     ${selectedBox === i ? " border-none hover:border-none btn rounded-none  " : ""
                         }`}
                     style={{
                         backgroundColor:  // Use boxColors array to set background color
@@ -274,6 +381,8 @@ const ColorControllerUI = () => {
     }
 
 
+
+
     const [backgroundColor, setBackgroundColor] = useState('white'); // Initial background color
 
     const mainDivRef = useRef(null);
@@ -306,9 +415,9 @@ const ColorControllerUI = () => {
             style={{ backgroundColor: backgroundColor }}
             ref={mainDivRef}
             id='main-div'
-            className="min-h-screen pb-10">
+            className="min-h-screen pb-10 flex justify-center items-center">
 
-            <div className="flex items-center gap-10 justify-center pt-10 lg:pt-40 scale-90 lg:scale-100">
+            <div className="flex items-center gap-10 justify-center scale-90 lg:scale-100">
                 {
                     !isGridCreated ? (
                         <button onClick={createAGrid} className="bg-[#A9A9A9] dark:bg-zinc-600 text-white text-center  px-7 py-5 rounded-lg">
@@ -325,6 +434,9 @@ const ColorControllerUI = () => {
             </div>
 
 
+            {/* --------------- SLIDER PANEL ---------------- */}
+
+
             <div className="flex flex-col justify-center lg:justify-between bg-[#C4C4C4]  pt-10 rounded-2xl lg:scale-100 lg:absolute lg:bottom-14 lg:right-20 mt-10 lg:mt-0 w-[340px]">
                 <div className="flex items-center  flex-wrap ">
                     <ColorSlider svg="/GS_handle.svg" color="white" value={black} onChange={(value) => handleSliderChange('Black', value)} />
@@ -339,7 +451,7 @@ const ColorControllerUI = () => {
                     <div className='bg-[#A9A9A9] dark:bg-zinc-600 text-white text-center w-1/2 p-3 rounded-bl-2xl'>
                         <h2>
                             {
-                                `${red},${green},${blue}`
+                                `${red}.${green}.${blue}`
                             }
                         </h2>
                     </div>
