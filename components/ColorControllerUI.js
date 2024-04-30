@@ -126,7 +126,7 @@ const ColorControllerUI = () => {
 
     const [outputColor, setOutputColor] = useState(outputColorCode); // Initial output color
     const [boxColors, setBoxColors] = useState(Array(16).fill(outputColorCode)); // Array to store colors of each box
-    const [selectedBox, setSelectedBox] = useState(null); // State to keep track of the selected box
+    let [selectedBox, setSelectedBox] = useState(null); // State to keep track of the selected box
 
     console.log('Selected Box:', selectedBox)
 
@@ -135,12 +135,21 @@ const ColorControllerUI = () => {
         setOutputColor(
             newColor
         );
-        // If a box is selected, update its color
+        // If a box is selected update its color, if multiple box selected updated multiple box color (selextedBox is an array)
         if (selectedBox !== null) {
             const newBoxColors = [...boxColors]; // Create a copy of boxColors
-            newBoxColors[selectedBox] = newColor; // Update the color of the selected box
+            if (Array.isArray(selectedBox)) {
+                selectedBox.forEach((index) => {
+                    newBoxColors[index] = newColor; // Update the color of the selected box
+                });
+            } else {
+                newBoxColors[selectedBox] = newColor; // Update the color of the selected box
+            }
             setBoxColors(newBoxColors); // Update boxColors state
         }
+
+
+
     };
 
 
@@ -162,15 +171,37 @@ const ColorControllerUI = () => {
 
     const [clonedOutputColor, setClonedOutputColor] = useState(null);
 
+
     useEffect(() => {
         const handleKeyDown = (event) => {
-            if (event.key === 'Shift' && selectedBox !== null) {
-                setClonedOutputColor(boxColors[selectedBox]);
+            // if (event.key === 'Shift' && selectedBox !== null) {
+            //     setClonedOutputColor(boxColors[selectedBox]);
+            // }
+
+            // selected box is array now
+            if (event.shiftKey && selectedBox !== null) {
+                // setClonedOutputColor(boxColors[selectedBox]);
+                //    selected box either can be a single value or can be an array of values
+
+                if (selectedBox !== null) {
+                    if (Array.isArray(selectedBox)) {
+                        setClonedOutputColor(boxColors[selectedBox[0]]);
+                    } else {
+                        setClonedOutputColor(boxColors[selectedBox]);
+                    }
+                }
+
             }
+
+
+
+
+
         };
 
         const handleKeyUp = (event) => {
             if (event.key === 'Shift' && selectedBox !== null) {
+                setClonedOutputColor(null);
             }
         };
 
@@ -193,14 +224,61 @@ const ColorControllerUI = () => {
         // if any cloned color is present, set the cloned color to the selected box
 
         if (clonedOutputColor !== null) {
+
             const newBoxColors = [...boxColors]; // Create a copy of boxColors
             newBoxColors[index] = clonedOutputColor; // Update the color of the selected box
             setBoxColors(newBoxColors); // Update boxColors state
 
-            setSelectedBox(index);
+            // setSelectedBox(selectedBox); // Update the selected box state
+
+            // make all the box (clicked after shift key) as an array of selected boxes
+
+            let selectedBoxes = [];
+
+            // for (let i = 0; i < boxColors.length; i++) {
+            //     if (boxColors[i] === clonedOutputColor) {
+            //         selectedBoxes.push(i);
+            //     }
+            // }
+
+            // LOGIC FOR SELECTING MULTIPLE BOXES 2
+            // Select all the box that matched the color of clonedOutputColor
+
+            // boxColors.forEach((color, i) => {
+            //     if (color === clonedOutputColor) {
+            //         selectedBoxes.push(i);
+            //     }
+            // }
+            // );
+
+            // COMBINED LOGIC FOR SELECTING MULTIPLE BOXES
+
+            // if the selected box is not an array, then push the selected box to the selectedBoxes array
+            if (!Array.isArray(selectedBox)) {
+                selectedBoxes.push(selectedBox);
+            }
+
+            // if the selected box is an array, then push all the selected boxes to the selectedBoxes array
+            if (Array.isArray(selectedBox)) {
+                selectedBoxes = selectedBox;
+            }
+
+            // push the clicked box to the selectedBoxes array
+            selectedBoxes.push(index);
 
 
 
+
+
+
+
+
+
+
+
+
+
+            setSelectedBox(selectedBoxes); // Update the selected box state
 
             //update the sliders values according to the cloned color values
 
@@ -292,11 +370,13 @@ const ColorControllerUI = () => {
     // Function to create individual grid box elements
     const createGrid = (gridNumber) => {
         let grid = [];
+
+        // Loop to create grid boxes (selectedBox is an array)
         for (let i = 0; i < gridNumber; i++) {
             grid.push(
                 <div
                     key={i}
-                    className={`w-[120px] h-[120px] lg:w-[200px] lg:h-[200px]  cursor-pointer     ${selectedBox === i ? " border-none hover:border-none btn rounded-none  " : ""
+                    className={`w-[120px] h-[120px] lg:w-[200px] lg:h-[200px]  cursor-pointer  " border-none hover:border-none btn rounded-none  " 
                         }`}
                     style={{
                         backgroundColor:  // Use boxColors array to set background color
@@ -306,6 +386,7 @@ const ColorControllerUI = () => {
                 ></div>
             );
         }
+
         return grid;
     };
 
