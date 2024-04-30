@@ -42,18 +42,119 @@ const ColorControllerUI = () => {
 
                 break;
             case 'Yellow':
-                newRed = value;
-                newGreen = value;
+
+                // newRed = value;
+                // newGreen = value;
+
+                // Corrected formula
+                // newRed = value;
+                // newGreen = Math.round(2 * value - newRed);
+
+                //when pressing/dragging yellow slider, the newRed and newGreen sliders maintain their Relative position to the Secondary slider when moving up and down instead of equalizing both Primary sliders' positions to the yellow slider position. 
+
+                // when yellow slider is moving down, the green and red slider smoothly come closer to the yellow slider position and when all three sliders are at the same position, the yellow slider moves down and the green and red slider moves along with it.
+
+                if (value > yellow) {
+                    // when yellow slider is moving up
+                    // greater from green or red is constant until yellow slider reaches to the same position, then all three sliders move up together till 255
+                    if (green > red) {
+                        newGreen = green > 255 ? 255 : green;
+                        newRed = Math.round(2 * value - green);
+                    } else {
+                        newRed = red > 255 ? 255 : red;
+                        newGreen = Math.round(2 * value - red);
+                    }
+
+
+                } else {
+                    // when yellow slider is moving down
+                    // lower from green or red is constant until yellow slider reaches to the same position, then all three sliders move down together till 0
+                    if (green < red) {
+                        newGreen = green < 0 ? 0 : green;
+                        newRed = Math.round(2 * value - green);
+                    } else {
+                        newRed = red < 0 ? 0 : red;
+                        newGreen = Math.round(2 * value - red);
+                    }
+
+                }
+
                 setYellow(value); // Update the state variable for Yellow
                 break;
             case 'Cyan':
-                newGreen = value;
-                newBlue = value;
+                // newGreen = value;
+                // newBlue = value;
+
+                // Corrected formula
+                // newGreen = value;
+                // newBlue = Math.round(2 * value - newGreen);
+
+
+                //when pressing/dragging cyan slider, the newGreen and newBlue sliders maintain their Relative position to the Secondary slider when moving up and down instead of equalizing both Primary sliders' positions to the cyan slider position.
+
+                // when cyan slider is moving down, the green and blue slider smoothly come closer to the cyan slider position and when all three sliders are at the same position, the cyan slider moves down and the green and blue slider moves along with it.
+
+                if (value > cyan) {
+                    // when cyan slider is moving up
+                    // greater from green or blue is constant until cyan slider reaches to the same position, then all three sliders move up together till 255
+                    if (green > blue) {
+                        newGreen = green;
+                        newBlue = Math.round(2 * value - green);
+                    } else {
+                        newBlue = blue;
+                        newGreen = Math.round(2 * value - blue);
+                    }
+
+                } else {
+                    // when cyan slider is moving down
+                    // lower from green or blue is constant until cyan slider reaches to the same position, then all three sliders move down together till 0
+                    if (green < blue) {
+                        newGreen = green;
+                        newBlue = Math.round(2 * value - green);
+                    } else {
+                        newBlue = blue;
+                        newGreen = Math.round(2 * value - blue);
+                    }
+                }
+
                 setCyan(value); // Update the state variable for Cyan
                 break;
             case 'Magenta':
-                newRed = value;
-                newBlue = value;
+                // newRed = value;
+                // newBlue = value;
+
+                // Corrected formula
+                // newRed = value;
+                // newBlue = Math.round(2 * value - newRed);
+
+
+                //when pressing/dragging magenta slider, the newRed and newBlue sliders maintain their Relative position to the Secondary slider when moving up and down instead of equalizing both Primary sliders' positions to the magenta slider position.
+
+                // when magenta slider is moving down, the red and blue slider smoothly come closer to the magenta slider position and when all three sliders are at the same position, the magenta slider moves down and the red and blue slider moves along with it.
+
+                if (value > magenta) {
+                    // when magenta slider is moving up
+                    // greater from red or blue is constant until magenta slider reaches to the same position, then all three sliders move up together till 255
+
+                    if (red > blue) {
+                        newRed = red;
+                        newBlue = Math.round(2 * value - red);
+                    } else {
+                        newBlue = blue;
+                        newRed = Math.round(2 * value - blue);
+                    }
+                } else {
+                    // when magenta slider is moving down
+                    // lower from red or blue is constant until magenta slider reaches to the same position, then all three sliders move down together till 0
+                    if (red < blue) {
+                        newRed = red;
+                        newBlue = Math.round(2 * value - red);
+                    } else {
+                        newBlue = blue;
+                        newRed = Math.round(2 * value - blue);
+                    }
+                }
+
                 setMagenta(value); // Update the state variable for Magenta
                 break;
             default:
@@ -63,7 +164,6 @@ const ColorControllerUI = () => {
         // Update Black slider position
         const newBlack = Math.round((newRed + newGreen + newBlue) / 3);
         setBlack(newBlack);
-
         setRed(newRed);
         setGreen(newGreen);
         setBlue(newBlue);
@@ -71,19 +171,22 @@ const ColorControllerUI = () => {
 
         // Update Yellow slider position when Red slider or Green slider position is changed and also update Yellow SLider when Magenta slider is changed
         if (color === 'Red' || color === 'Green' || color === 'Magenta' || color === 'Cyan') {
-            setYellow(Math.round((newRed + newGreen) / 2));
+            // setYellow(Math.round((newRed + newGreen) / 2)); 
+            setYellow(Math.round(newRed + (newGreen - newRed) / 2)); // Corrected formula
         }
 
 
         // Update Cyan slider position when Green slider or Blue slider position is changed and also update Cyan SLider when Yellow slider is changed
         if (color === 'Green' || color === 'Blue' || color === 'Yellow' || color === 'Magenta') {
-            setCyan(Math.round((newGreen + newBlue) / 2));
+            // setCyan(Math.round((newGreen + newBlue) / 2));
+            setCyan(Math.round(newGreen + (newBlue - newGreen) / 2)); // Corrected formula
         }
 
 
         // Update Magenta slider position when Red slider or Blue slider position is changed and also update Magenta SLider when Yellow slider is changed
         if (color === 'Red' || color === 'Blue' || color === 'Yellow' || color === 'Cyan') {
-            setMagenta(Math.round((newRed + newBlue) / 2));
+            // setMagenta(Math.round((newRed + newBlue) / 2));
+            setMagenta(Math.round(newRed + (newBlue - newRed) / 2)); // Corrected formula
         }
     };
 
@@ -94,13 +197,16 @@ const ColorControllerUI = () => {
         setBlack(newBlack);
 
         // Update Yellow slider position when Red slider or Green slider position is changed and also update Yellow SLider when Magenta slider is changed
-        setYellow(Math.round((red + green) / 2));
+        // setYellow(Math.round((red + green) / 2));
+        setYellow(Math.round(red + (green - red) / 2)); // Corrected formula
 
         // Update Cyan slider position when Green slider or Blue slider position is changed and also update Cyan SLider when Yellow slider is changed
-        setCyan(Math.round((green + blue) / 2));
+        // setCyan(Math.round((green + blue) / 2)); 
+        setCyan(Math.round(green + (blue - green) / 2)); // Corrected formula
 
         // Update Magenta slider position when Red slider or Blue slider position is changed and also update Magenta SLider when Yellow slider is changed
-        setMagenta(Math.round((red + blue) / 2));
+        // setMagenta(Math.round((red + blue) / 2));
+        setMagenta(Math.round(red + (blue - red) / 2)); // Corrected formula
 
     }, [red, green, blue]);
 
