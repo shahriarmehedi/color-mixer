@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 'use client'
 
 import { useEffect, useRef, useState } from 'react';
@@ -6,8 +7,6 @@ import Swal from 'sweetalert2';
 
 const ColorControllerUI = () => {
 
-
-
     const [red, setRed] = useState(0);
     const [green, setGreen] = useState(0);
     const [blue, setBlue] = useState(0);
@@ -15,7 +14,6 @@ const ColorControllerUI = () => {
     const [yellow, setYellow] = useState(0); // Corrected state variable
     const [cyan, setCyan] = useState(0); // Corrected state variable
     const [magenta, setMagenta] = useState(0); // Corrected state variable
-
 
 
     const handleSliderChange = (color, value) => {
@@ -87,12 +85,7 @@ const ColorControllerUI = () => {
         if (color === 'Red' || color === 'Blue' || color === 'Yellow' || color === 'Cyan') {
             setMagenta(Math.round((newRed + newBlue) / 2));
         }
-
-
     };
-
-
-
 
     useEffect(() => {
 
@@ -130,13 +123,15 @@ const ColorControllerUI = () => {
 
     console.log('Selected Box:', selectedBox)
 
+
     // Function to handle changing the output color for a specific box
+
     const handleColorChange = (newColor) => {
         setOutputColor(
             newColor
         );
         // If a box is selected update its color, if multiple box selected updated multiple box color (selextedBox is an array)
-        if (selectedBox !== null) {
+        if (selectedBox !== null && selectedBox !== 'background') {
             const newBoxColors = [...boxColors]; // Create a copy of boxColors
             if (Array.isArray(selectedBox)) {
                 selectedBox.forEach((index) => {
@@ -147,11 +142,7 @@ const ColorControllerUI = () => {
             }
             setBoxColors(newBoxColors); // Update boxColors state
         }
-
-
-
     };
-
 
 
     // call handleColorChange when any of the color sliders are changed
@@ -174,29 +165,19 @@ const ColorControllerUI = () => {
 
     useEffect(() => {
         const handleKeyDown = (event) => {
-            // if (event.key === 'Shift' && selectedBox !== null) {
-            //     setClonedOutputColor(boxColors[selectedBox]);
-            // }
+            if (event.shiftKey && selectedBox !== null && selectedBox !== 'background') {
 
-            // selected box is array now
-            if (event.shiftKey && selectedBox !== null) {
                 // setClonedOutputColor(boxColors[selectedBox]);
                 //    selected box either can be a single value or can be an array of values
 
-                if (selectedBox !== null) {
-                    if (Array.isArray(selectedBox)) {
-                        setClonedOutputColor(boxColors[selectedBox[0]]);
-                    } else {
-                        setClonedOutputColor(boxColors[selectedBox]);
-                    }
+
+                if (Array.isArray(selectedBox)) {
+                    setClonedOutputColor(boxColors[selectedBox[0]]);
+                } else {
+                    setClonedOutputColor(boxColors[selectedBox]);
                 }
 
             }
-
-
-
-
-
         };
 
         const handleKeyUp = (event) => {
@@ -220,39 +201,19 @@ const ColorControllerUI = () => {
 
 
     // Function to handle selecting a box
+
     const handleBoxClick = (index) => {
         // if any cloned color is present, set the cloned color to the selected box
 
-        if (clonedOutputColor !== null) {
+        if (clonedOutputColor !== null && selectedBox !== 'background') {
 
             const newBoxColors = [...boxColors]; // Create a copy of boxColors
             newBoxColors[index] = clonedOutputColor; // Update the color of the selected box
             setBoxColors(newBoxColors); // Update boxColors state
 
-            // setSelectedBox(selectedBox); // Update the selected box state
-
-            // make all the box (clicked after shift key) as an array of selected boxes
-
-            let selectedBoxes = [];
-
-            // for (let i = 0; i < boxColors.length; i++) {
-            //     if (boxColors[i] === clonedOutputColor) {
-            //         selectedBoxes.push(i);
-            //     }
-            // }
-
-            // LOGIC FOR SELECTING MULTIPLE BOXES 2
-            // Select all the box that matched the color of clonedOutputColor
-
-            // boxColors.forEach((color, i) => {
-            //     if (color === clonedOutputColor) {
-            //         selectedBoxes.push(i);
-            //     }
-            // }
-            // );
-
             // COMBINED LOGIC FOR SELECTING MULTIPLE BOXES
 
+            let selectedBoxes = [];
             // if the selected box is not an array, then push the selected box to the selectedBoxes array
             if (!Array.isArray(selectedBox)) {
                 selectedBoxes.push(selectedBox);
@@ -265,18 +226,6 @@ const ColorControllerUI = () => {
 
             // push the clicked box to the selectedBoxes array
             selectedBoxes.push(index);
-
-
-
-
-
-
-
-
-
-
-
-
 
             setSelectedBox(selectedBoxes); // Update the selected box state
 
@@ -306,13 +255,14 @@ const ColorControllerUI = () => {
                 setBlue(parseInt(b));
             }
 
+        } else if (selectedBox === 'background') {
+            // make it null if background is selected
+            setSelectedBox(null);
+
 
 
         } else {
             setSelectedBox(index); // Update the selected box state
-
-
-
 
             // set the slider values to the selected box color values
 
@@ -340,31 +290,7 @@ const ColorControllerUI = () => {
                 setBlue(parseInt(b));
             }
         }
-
-
-
-
-
-
     };
-
-
-    // update box color instantly when cloned color is present and box is clicked
-
-    // useEffect(() => {
-    //     if (clonedOutputColor !== null) {
-    //         const newBoxColors = [...boxColors]; // Create a copy of boxColors
-    //         newBoxColors[selectedBox] = clonedOutputColor; // Update the color of the selected box
-    //         setBoxColors(newBoxColors); // Update boxColors state
-
-    //         // select multiple boxes as many boxes are clicked with same color as cloned color
-
-    //         setSelectedBox(selectedBox);
-
-    //     }
-    // }, [selectedBox, clonedOutputColor, boxColors]);
-
-
 
 
     // Function to create individual grid box elements
@@ -463,32 +389,93 @@ const ColorControllerUI = () => {
 
 
 
+    // Background color functionality
+
+    // if selected Box is 'background' then change the background color with slider values
+
+    if (selectedBox === 'background') {
+        document.getElementById('main-div').style.backgroundColor = outputColor;
+    }
+
+
+
 
     const [backgroundColor, setBackgroundColor] = useState('white'); // Initial background color
 
     const mainDivRef = useRef(null);
 
+    const [isControlPressed, setIsControlPressed] = useState(false);
+    const [isBackgroundSelected, setIsBackgroundSelected] = useState(false);
+
+    //  If ctrl + click on the main div, trigger background selected
+
     useEffect(() => {
-        // Function to handle clicks outside the grid area
-        const handleClickOutside = (event) => {
-            // Check if the click occurred outside the grid area
-            if (mainDivRef.current && !mainDivRef.current.contains(event.target)) {
-                // Change the background color of min-div only if grid is not created
-                if (isGridCreated) {
-                    console.log('Nothing')
-                }
+        const handleKeyDown = (event) => {
+            if (event.key === 'Control') {
+                setIsControlPressed(true);
             }
         };
 
-        // Add event listener to document body when component mounts
-        document.addEventListener('click', handleClickOutside);
-
-        // Remove event listener when component unmounts
-        return () => {
-            document.removeEventListener('click', handleClickOutside);
+        const handleKeyUp = (event) => {
+            if (event.key === 'Control') {
+                setIsControlPressed(false);
+            }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isGridCreated]); // Re-run effect when isGridCreated changes
+
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (isControlPressed) {
+            mainDivRef.current.style.cursor = 'crosshair';
+        } else {
+            mainDivRef.current.style.cursor = 'auto';
+        }
+    }, [isControlPressed]);
+
+    useEffect(() => {
+        if (isBackgroundSelected) {
+            mainDivRef.current.style.cursor = 'crosshair';
+        } else {
+            mainDivRef.current.style.cursor = 'auto';
+        }
+    }, [isBackgroundSelected]);
+
+    useEffect(() => {
+        const handleMouseDown = (event) => {
+            if (isControlPressed) {
+
+
+
+                setSelectedBox('background');
+                setIsBackgroundSelected(true);
+            }
+        };
+
+        const handleMouseUp = (event) => {
+            if (isBackgroundSelected) {
+                setIsBackgroundSelected(false);
+                setIsControlPressed(false);
+                setSelectedBox(null);
+            }
+        };
+
+        document.addEventListener('mousedown', handleMouseDown);
+        document.addEventListener('mouseup', handleMouseUp);
+
+        return () => {
+            document.removeEventListener('mousedown', handleMouseDown);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isControlPressed, isBackgroundSelected, outputColor]);
+
+
 
 
     return (
