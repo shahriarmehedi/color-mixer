@@ -54,13 +54,22 @@ const ColorControllerUI = () => {
 
                 // when yellow slider is moving down, the green and red slider smoothly come closer to the yellow slider position and when all three sliders are at the same position, the yellow slider moves down and the green and red slider moves along with it.
 
+
+
+
+
+
                 if (value > yellow) {
                     // when yellow slider is moving up
                     // greater from green or red is constant until yellow slider reaches to the same position, then all three sliders move up together till 255
+                    // yellow, green and red value can not be greater than 255 and less than 0
+
                     if (green > red) {
+                        newGreen = green;
                         newGreen = green > 255 ? 255 : green;
                         newRed = Math.round(2 * value - green);
                     } else {
+                        newRed = red;
                         newRed = red > 255 ? 255 : red;
                         newGreen = Math.round(2 * value - red);
                     }
@@ -70,15 +79,22 @@ const ColorControllerUI = () => {
                     // when yellow slider is moving down
                     // lower from green or red is constant until yellow slider reaches to the same position, then all three sliders move down together till 0
                     if (green < red) {
+                        newGreen = green;
                         newGreen = green < 0 ? 0 : green;
                         newRed = Math.round(2 * value - green);
                     } else {
+                        newRed = red;
                         newRed = red < 0 ? 0 : red;
                         newGreen = Math.round(2 * value - red);
                     }
 
                 }
-
+                value = value > 255 ? 255 : value;
+                value = value < 0 ? 0 : value;
+                newGreen = newGreen > 255 ? 255 : newGreen;
+                newGreen = newGreen < 0 ? 0 : newGreen;
+                newRed = newRed > 255 ? 255 : newRed;
+                newRed = newRed < 0 ? 0 : newRed;
                 setYellow(value); // Update the state variable for Yellow
                 break;
             case 'Cyan':
@@ -117,6 +133,13 @@ const ColorControllerUI = () => {
                     }
                 }
 
+                value = value > 255 ? 255 : value;
+                value = value < 0 ? 0 : value;
+                newGreen = newGreen > 255 ? 255 : newGreen;
+                newGreen = newGreen < 0 ? 0 : newGreen;
+                newBlue = newBlue > 255 ? 255 : newBlue;
+                newBlue = newBlue < 0 ? 0 : newBlue;
+
                 setCyan(value); // Update the state variable for Cyan
                 break;
             case 'Magenta':
@@ -154,6 +177,13 @@ const ColorControllerUI = () => {
                         newRed = Math.round(2 * value - blue);
                     }
                 }
+
+                value = value > 255 ? 255 : value;
+                value = value < 0 ? 0 : value;
+                newRed = newRed > 255 ? 255 : newRed;
+                newRed = newRed < 0 ? 0 : newRed;
+                newBlue = newBlue > 255 ? 255 : newBlue;
+                newBlue = newBlue < 0 ? 0 : newBlue;
 
                 setMagenta(value); // Update the state variable for Magenta
                 break;
