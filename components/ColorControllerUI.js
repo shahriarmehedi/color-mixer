@@ -220,9 +220,6 @@ const ColorControllerUI = () => {
     // ------------------- GRID Color Controller UI ------------------- //
 
 
-    const [gridNumber, setGridNumber] = useState(9);
-
-
     const [outputColor, setOutputColor] = useState(outputColorCode); // Initial output color
     const [boxColors, setBoxColors] = useState(Array(16).fill(outputColorCode)); // Array to store colors of each box
     let [selectedBox, setSelectedBox] = useState(null); // State to keep track of the selected box
@@ -400,20 +397,27 @@ const ColorControllerUI = () => {
 
 
     // Function to create individual grid box elements
-    const createGrid = (gridNumber) => {
+    const createGrid = (gridNumber, width, height) => {
         let grid = [];
+
+
 
         // Loop to create grid boxes (selectedBox is an array)
         for (let i = 0; i < gridNumber; i++) {
             grid.push(
                 <div
                     key={i}
-                    className={`w-[120px] h-[120px] lg:w-[200px] lg:h-[200px]  cursor-pointer  " border-none hover:border-none btn rounded-none  " 
-                        }`}
-                    style={{
-                        backgroundColor:  // Use boxColors array to set background color
-                            boxColors[i],
-                    }}
+                    style={
+                        {
+                            width: `${width}px`,
+                            height: `${height}px`,
+                            backgroundColor:  // Use boxColors array to set background color
+                                boxColors[i]
+                        }
+
+                    }
+                    className={` cursor-pointer  shadow-none border-none hover:border-none btn rounded-none`}
+
                     onClick={() => handleBoxClick(i)} // Call handleBoxClick when a box is clicked
                 ></div>
             );
@@ -422,76 +426,8 @@ const ColorControllerUI = () => {
         return grid;
     };
 
-    // Determine appropriate grid structure based on grid number
-    const gridClass =
-        gridNumber === 1
-            ? ""
-            : gridNumber === 2
-                ? "grid-cols-2"
-                : gridNumber > 2 && gridNumber <= 3
-                    ? "grid-cols-3"
-                    : gridNumber === 4
-                        ? "grid-cols-2"
-                        : gridNumber >= 5 && gridNumber <= 9
-                            ? "grid-cols-3"
-                            : gridNumber >= 10 && gridNumber <= 12
-                                ? "grid-cols-4"
-                                : "grid-cols-5";
 
 
-
-    // state
-
-    const [isGridCreated, setIsGridCreated] = useState(false);
-
-    const createAGrid = () => {
-        Swal.fire({
-            // max grid number is 16
-            title: 'Enter grid number:',
-            input: 'number',
-            inputAttributes: {
-                min: 1,
-                max: 12,
-                step: 1,
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Create Layout',
-            cancelButtonText: 'Cancel',
-            showLoaderOnConfirm: true,
-            preConfirm: (gridNumber) => {
-                return new Promise((resolve) => {
-                    if (gridNumber > 0 && gridNumber <= 16) {
-                        resolve();
-                    } else {
-                        resolve(Swal.showValidationMessage('Please enter a number between 1 and 16'));
-                    }
-                });
-            }
-        })
-            .then((result) => {
-                if (result.isConfirmed) {
-                    setGridNumber(parseInt(result.value));
-                    setIsGridCreated(true);
-                }
-            });
-    }
-
-
-    const resetLayout = () => {
-        setRed(0);
-        setGreen(0);
-        setBlue(0);
-        setBlack(0);
-        setYellow(0);
-        setCyan(0);
-        setMagenta(0);
-        setGridNumber(0);
-        setIsGridCreated(false);
-        // clear the box colors and set 0,0,0 color to all boxes
-        setBoxColors(Array(16).fill('rgb(0,0,0)'));
-        setSelectedBox(null);
-
-    }
 
 
 
@@ -583,6 +519,38 @@ const ColorControllerUI = () => {
 
 
 
+    // ------- HARD CODED GRID/BOX VALUES--------- //
+
+    const rows = 2;
+    const columns = 2;
+    const width = 200;
+    const height = 200;
+    const verticalSpace = 10;
+    const horizontalSpace = 10;
+
+    //calculate grid number based on rows and columns
+    const gridNumber = rows * columns;
+
+
+
+    // Determine appropriate grid structure based on grid number
+    const gridClass =
+        gridNumber === 1
+            ? ""
+            : gridNumber === 2
+                ? "grid-cols-2"
+                : gridNumber > 2 && gridNumber <= 3
+                    ? "grid-cols-3"
+                    : gridNumber === 4
+                        ? "grid-cols-2"
+                        : gridNumber >= 5 && gridNumber <= 9
+                            ? "grid-cols-3"
+                            : gridNumber >= 10 && gridNumber <= 12
+                                ? "grid-cols-4"
+                                : "grid-cols-5";
+
+
+
 
     return (
         <div
@@ -593,17 +561,19 @@ const ColorControllerUI = () => {
 
             <div className="flex items-center gap-10 justify-center scale-90 lg:scale-100">
                 {
-                    !isGridCreated ? (
-                        <button onClick={createAGrid} className="bg-[#A9A9A9] dark:bg-zinc-600 text-white text-center  px-7 py-5 rounded-lg">
-                            Create a Grid Layout
-                        </button>
-                    ) : (
-                        <div
-                            className={`grid grid-cols-1 gap-5 ${gridClass}`}
-                        >
-                            {createGrid(gridNumber)}
-                        </div>
-                    )
+
+                    <div
+                        style={
+                            {
+                                //vertical and horizontal space between the grid boxes
+                                gridGap: `${verticalSpace}px ${horizontalSpace}px`,
+                            }
+                        }
+                        className={`grid grid-cols-1 ${gridClass}`}
+                    >
+                        {createGrid(gridNumber, width, height, verticalSpace, horizontalSpace)}
+                    </div>
+
                 }
             </div>
 
@@ -640,24 +610,7 @@ const ColorControllerUI = () => {
                 </div>
             </div>
 
-            {
-                isGridCreated && (
-                    <div
-                        onClick={resetLayout}
-                        className=" lg:absolute lg:bottom-14 lg:left-20 w-[300px] cursor-pointer">
-                        {/* reset layout button */}
-                        <div className="flex justify-center items-center gap-1 pt-7">
-                            <div className='bg-[#A9A9A9] dark:bg-zinc-600 text-white text-center w-1/2 p-3 rounded-lg'>
-                                <h2>
-                                    {
-                                        `Reset Layout`
-                                    }
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
+
 
         </div>
     );
